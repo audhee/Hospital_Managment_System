@@ -1,0 +1,39 @@
+{% extends 'clinic/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">My Medical Dashboard</h2>
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td>Dr. {{ appt.doctor.first_name }} {{ appt.doctor.last_name|default:appt.doctor.username }}</td>
+                        <td>{{ appt.date }}</td>
+                        <td>{{ appt.time }}</td>
+                        <td>
+                            <span class="badge {% if appt.status == 'Pending' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ appt.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No appointments found. <a href="{% url 'doctor_list' %}">Book one now!</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'clinic/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4 text-primary">👨‍⚕️ Doctor's Appointment Schedule</h2>
+    <div class="card shadow border-0">
+        <div class="card-body">
+            <table class="table align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Reason for Visit</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Current Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td><strong>{{ appt.patient.username }}</strong></td>
+                        <td>{{ appt.description }}</td>
+                        <td>{{ appt.date }}</td>
+                        <td>{{ appt.time }}</td>
+                        <td>
+                            <span class="badge bg-warning text-dark">{{ appt.status }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            No patients scheduled yet. Relax, Doc!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

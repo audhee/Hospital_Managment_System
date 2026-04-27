@@ -1,0 +1,30 @@
+{% extends 'clinic/base.html' %}
+
+{% block content %}
+<h2 class="mb-4 text-center">Our Specialized Doctors</h2>
+<div class="row">
+    {% for doctor in doctors %}
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center d-flex flex-column">
+                <h5 class="card-title">Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}</h5>
+                <p class="text-muted mb-1">{{ doctor.specialization }}</p>
+                <div class="mb-3">
+                    <span class="badge bg-info text-dark">{{ doctor.dept|default:"General" }} Department</span>
+                </div>
+                
+                <div class="mt-auto">
+                    <a href="{% url 'book_appointment' %}?doctor={{ doctor.user.id }}" class="btn btn-primary">
+    Book Appointment
+</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center">
+        <p class="text-muted">No doctors are currently available. Check back soon!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
