@@ -1,30 +1,82 @@
 {% extends 'clinic/base.html' %}
 
 {% block content %}
-<h2 class="mb-4 text-center">Our Specialized Doctors</h2>
-<div class="row">
-    {% for doctor in doctors %}
-    <div class="col-md-4 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body text-center d-flex flex-column">
-                <h5 class="card-title">Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}</h5>
-                <p class="text-muted mb-1">{{ doctor.specialization }}</p>
-                <div class="mb-3">
-                    <span class="badge bg-info text-dark">{{ doctor.dept|default:"General" }} Department</span>
-                </div>
-                
-                <div class="mt-auto">
-                    <a href="{% url 'book_appointment' %}?doctor={{ doctor.user.id }}" class="btn btn-primary">
-    Book Appointment
-</a>
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0">Our Specialized Doctors</h2>
+        <form method="GET" class="d-flex align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm border">
+            <label for="date" class="ms-2 fw-bold text-muted small text-uppercase">Availability For:</label>
+            <input type="date" name="date" id="date" value="{{ selected_date }}" 
+                   class="form-control form-control-sm border-0 fw-bold" onchange="this.form.submit()">
+        </form>
+    </div>
+
+    <div class="row">
+        {% for item in doctor_data %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm h-100 border-0 rounded-4 overflow-hidden hover-lift transition">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div>
+                            <h5 class="card-title mb-1 fw-bold text-dark">Dr. {{ item.doctor.user.get_full_name|default:item.doctor.user.username }}</h5>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3">{{ item.doctor.specialization }}</span>
+                        </div>
+                        <div class="bg-light p-2 rounded-circle">
+                            <i class="fas fa-user-md text-primary fa-lg"></i>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted small mb-3">
+                        <i class="fas fa-hospital me-1"></i> {{ item.doctor.dept|default:"General" }} Department
+                    </p>
+
+                    <div class="mb-4">
+                        <label class="fw-bold small text-muted text-uppercase d-block mb-2">Availability Status:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% if item.status_info.doctor_status == 'Available' %}
+                                <span class="badge bg-success text-white py-2 px-3 rounded-3"><i class="fas fa-check-circle me-1"></i> Available</span>
+                                <span class="badge bg-light text-dark border py-2 px-3 rounded-3">{{ item.status_info.working_hours }}</span>
+                            {% elif item.status_info.doctor_status == 'On Leave' %}
+                                <span class="badge bg-danger text-white py-2 px-3 rounded-3"><i class="fas fa-plane-departure me-1"></i> On Leave</span>
+                            {% else %}
+                                <span class="badge bg-secondary text-white py-2 px-3 rounded-3"><i class="fas fa-bed me-1"></i> Not Working Today</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if not user.is_authenticated or not user.is_doctor %}
+                    <div class="mt-auto pt-3 border-top d-grid">
+                        <a href="{% url 'book_appointment' %}?doctor={{ item.doctor.user.id }}&date={{ selected_date }}" class="btn btn-primary rounded-pill fw-bold">
+                            Book Appointment
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="display-1 text-muted mb-4"><i class="fas fa-search"></i></div>
+            <h3 class="text-muted">No doctors found for the selected criteria.</h3>
+            <a href="{% url 'doctor_list' %}" class="btn btn-outline-primary mt-3">Reset Search</a>
+        </div>
+        {% endfor %}
     </div>
-    {% empty %}
-    <div class="col-12 text-center">
-        <p class="text-muted">No doctors are currently available. Check back soon!</p>
-    </div>
-    {% endfor %}
 </div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+    }
+    .bg-primary-subtle {
+        background-color: #e7f1ff;
+    }
+</style>
 {% endblock %}

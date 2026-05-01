@@ -5,8 +5,9 @@
     <h1>Welcome to the Hospital Management System</h1>
     <p class="lead">Building the future of healthcare, one line of code at a time.</p>
     {% if not user.is_authenticated %}
-        <div class="mt-4">
-            <a href="{% url 'signup' %}" class="btn btn-success btn-lg">Start as a Patient</a>
+        <div class="mt-4 d-flex justify-content-center gap-3">
+            <a href="{% url 'signup' %}" class="btn btn-success btn-lg px-4 rounded-pill shadow-sm">Start as a Patient</a>
+            <a href="{% url 'doctor_signup' %}" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm">Start as a Doctor</a>
         </div>
     {% endif %}
 </div>

@@ -1,0 +1,138 @@
+{% extends 'clinic/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-gradient bg-primary text-white p-4">
+                    <h3 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> Configure Your Working Hours</h3>
+                    <p class="mb-0 opacity-75">Set your weekly schedule and daily patient capacity.</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="table-responsive">
+                            <table class="table align-middle text-center table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Working?</th>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
+                                        <th>Slot (mins)</th>
+                                        <th>Daily Cap</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for day in schedule_data %}
+                                    <tr id="row_{{ day.day_int }}">
+                                        <td class="fw-bold">{{ day.day_name }}</td>
+                                        <td>
+                                            <div class="form-check form-switch d-flex justify-content-center">
+                                                <input class="form-check-input fs-4 cursor-pointer day-toggle" type="checkbox" role="switch" name="day_{{ day.day_int }}_active" id="day_{{ day.day_int }}_active" {% if day.is_active %}checked{% endif %} data-day="{{ day.day_int }}">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="time" class="form-control form-control-sm" name="day_{{ day.day_int }}_start" id="day_{{ day.day_int }}_start" value="{{ day.start_time }}" {% if not day.is_active %}disabled{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="time" class="form-control form-control-sm" name="day_{{ day.day_int }}_end" id="day_{{ day.day_int }}_end" value="{{ day.end_time }}" {% if not day.is_active %}disabled{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm" name="day_{{ day.day_int }}_duration" id="day_{{ day.day_int }}_duration" value="{{ day.slot_duration }}" min="5" max="120" {% if not day.is_active %}disabled{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm" name="day_{{ day.day_int }}_capacity" id="day_{{ day.day_int }}_capacity" value="{{ day.max_appointments }}" min="1" {% if not day.is_active %}disabled{% endif %}>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4 d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm py-3 fw-bold">
+                                <i class="fas fa-save me-2"></i> Save My Weekly Schedule
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const toggles = document.querySelectorAll('.day-toggle');
+    toggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const dayId = this.dataset.day;
+            const isChecked = this.checked;
+            
+            ['start', 'end', 'duration', 'capacity'].forEach(field => {
+                const input = document.getElementById(`day_${dayId}_${field}`);
+                if (input) {
+                    input.disabled = !isChecked;
+                }
+            });
+            
+            const row = document.getElementById(`row_${dayId}`);
+            if(isChecked) {
+                row.classList.remove('opacity-50');
+            } else {
+                row.classList.add('opacity-50');
+            }
+        });
+        // trigger event initially to set opacity
+        if (!toggle.checked) {
+            document.getElementById(`row_${toggle.dataset.day}`).classList.add('opacity-50');
+        }
+    });
+});
+</script>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    }
+    .hover-shadow:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border-color: #0d6efd !important;
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    input[type="time"], input[type="number"] {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #dee2e6;
+        appearance: none;
+        border-radius: 0.5rem;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+    input:focus {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .form-check-input {
+        width: 1.25em;
+        height: 1.25em;
+        margin-top: 0.125em;
+    }
+</style>
+{% endblock %}

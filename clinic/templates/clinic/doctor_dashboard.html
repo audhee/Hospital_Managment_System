@@ -2,39 +2,91 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="mb-4 text-primary">👨‍⚕️ Doctor's Appointment Schedule</h2>
-    <div class="card shadow border-0">
-        <div class="card-body">
-            <table class="table align-middle">
-                <thead class="table-primary">
-                    <tr>
-                        <th>Patient Name</th>
-                        <th>Reason for Visit</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Current Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for appt in appointments %}
-                    <tr>
-                        <td><strong>{{ appt.patient.username }}</strong></td>
-                        <td>{{ appt.description }}</td>
-                        <td>{{ appt.date }}</td>
-                        <td>{{ appt.time }}</td>
-                        <td>
-                            <span class="badge bg-warning text-dark">{{ appt.status }}</span>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">
-                            No patients scheduled yet. Relax, Doc!
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary mb-0">👨‍⚕️ Doctor's Appointment Schedule</h2>
+        <a href="{% url 'manage_schedule' %}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <i class="fas fa-cog me-2"></i> Manage My Schedule
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-light fw-bold">
+                    <i class="fas fa-clock me-2 text-primary"></i> Current Schedule
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for sched in doctor_schedules %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>{{ sched.get_day_of_week_display }}:</strong></span>
+                            <span class="text-muted">{{ sched.start_time|time:"H:i" }} - {{ sched.end_time|time:"H:i" }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-muted text-center">No schedule set.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-body">
+                    <table class="table align-middle">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Reason for Visit</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in appointments %}
+                            <tr>
+                                <td><strong>{{ appt.patient.get_full_name|default:appt.patient.username }}</strong></td>
+                                <td>{{ appt.description|truncatechars:50 }}</td>
+                                <td>{{ appt.date }}</td>
+                                <td>{{ appt.time }}</td>
+                                <td>
+                                    {% if appt.status == 'Pending' %}
+                                        <span class="badge bg-warning text-dark">{{ appt.status }}</span>
+                                    {% elif appt.status == 'Confirmed' %}
+                                        <span class="badge bg-success">{{ appt.status }}</span>
+                                    {% elif appt.status == 'Cancelled' %}
+                                        <span class="badge bg-danger">{{ appt.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ appt.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        {% if appt.status == 'Pending' %}
+                                            <a href="{% url 'update_appointment_status' appt.id 'Confirmed' %}" class="btn btn-success" title="Confirm">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            <a href="{% url 'update_appointment_status' appt.id 'Cancelled' %}" class="btn btn-danger" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        {% endif %}
+                                        <a href="{% url 'download_appointment_pdf' appt.id %}" class="btn btn-outline-primary" title="Download PDF">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No patients scheduled yet. Relax, Doc!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

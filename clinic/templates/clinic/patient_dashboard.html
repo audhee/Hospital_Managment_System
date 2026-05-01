@@ -12,6 +12,7 @@
                         <th>Date</th>
                         <th>Time</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,10 +26,15 @@
                                 {{ appt.status }}
                             </span>
                         </td>
+                        <td>
+                            <a href="{% url 'download_appointment_pdf' appt.id %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </a>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center">No appointments found. <a href="{% url 'doctor_list' %}">Book one now!</a></td>
+                        <td colspan="5" class="text-center">No appointments found. <a href="{% url 'doctor_list' %}">Book one now!</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
