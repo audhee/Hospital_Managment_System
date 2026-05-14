@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from . import views
+from . import views, api_views
 
 # Ensure this name is exactly 'urlpatterns'
 urlpatterns = [
@@ -16,5 +16,6 @@ urlpatterns = [
     path('manage-schedule/', views.manage_schedule, name='manage_schedule'),
     path('appointment/<int:appointment_id>/pdf/', views.download_appointment_pdf, name='download_appointment_pdf'),
     path('api/slots/available/', views.available_slots_api, name='available_slots_api'),
+    path('api/book_appointment/', api_views.BookAppointmentAPIView.as_view(), name='book_appointment_api'),
     path('appointment/<int:appointment_id>/status/<str:new_status>/', views.update_appointment_status, name='update_appointment_status'),
 ]

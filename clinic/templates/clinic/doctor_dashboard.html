@@ -90,4 +90,48 @@
         </div>
     </div>
 </div>
+
+<!-- Notification Container -->
+<div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<script>
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/doctor/dashboard/`;
+    
+    const socket = new WebSocket(wsUrl);
+
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data.type === 'appointment_update') {
+            showNotification(data.data);
+            // Optionally reload the table or append the new appointment
+            // For now, let's just alert the user or show a toast
+            console.log("Real-time update received:", data.data);
+        }
+    };
+
+    socket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    function showNotification(data) {
+        const container = document.getElementById('notification-container');
+        const notification = document.createElement('div');
+        notification.className = `alert alert-info alert-dismissible fade show shadow`;
+        notification.innerHTML = `
+            <strong>New ${data.event}!</strong><br>
+            Patient: ${data.patient}<br>
+            Time: ${data.date} at ${data.time}<br>
+            Status: ${data.status}<br>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        container.appendChild(notification);
+        
+        // Auto-refresh the page after 5 seconds to show the new appointment in the table
+        // or we could dynamically append it to the table for a better UX.
+        setTimeout(() => {
+            window.location.reload();
+        }, 5000);
+    }
+</script>
 {% endblock %}

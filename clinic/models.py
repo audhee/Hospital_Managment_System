@@ -35,6 +35,9 @@ class Appointment(models.Model):
     time = models.TimeField()
     description = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices = STATUS_CHOICES, default='Pending')
+    source = models.CharField(max_length=50, default='web')
+    call_id = models.CharField(max_length=100, blank=True, null=True)
+    booking_timestamp = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.patient.username} with {self.doctor.username}"
